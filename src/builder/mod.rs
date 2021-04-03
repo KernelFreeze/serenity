@@ -30,6 +30,7 @@ mod edit_member;
 mod edit_message;
 mod edit_profile;
 mod edit_role;
+mod edit_voice_state;
 mod execute_webhook;
 mod get_messages;
 
@@ -46,6 +47,7 @@ pub use self::{
     edit_message::EditMessage,
     edit_profile::EditProfile,
     edit_role::EditRole,
+    edit_voice_state::EditVoiceState,
     execute_webhook::ExecuteWebhook,
     get_messages::GetMessages,
 };

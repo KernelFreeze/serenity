@@ -236,6 +236,12 @@ pub enum Route {
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdVanityUrl(u64),
+    /// Route for the `/guilds/:guild_id/voice-states/:user_id` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: crate::model::id::GuildId
+    GuildsIdVoiceStates(u64),
     /// Route for the `/guilds/:guild_id/webhooks` path.
     ///
     /// The data is the relevant [`GuildId`].
@@ -556,6 +562,10 @@ impl Route {
 
     pub fn guild_vanity_url(guild_id: u64) -> String {
         format!(api!("/guilds/{}/vanity-url"), guild_id)
+    }
+
+    pub fn guild_voice_states<D: Display>(guild_id: u64, target: D) -> String {
+        format!(api!("/guilds/{}/voice-states/{}"), guild_id, target)
     }
 
     pub fn guild_webhooks(guild_id: u64) -> String {
@@ -936,6 +946,10 @@ pub enum RouteInfo<'a> {
     },
     EditRolePosition {
         guild_id: u64,
+    },
+    EditVoiceState {
+        guild_id: u64,
+        user_id: Option<u64>,
     },
     EditWebhook {
         webhook_id: u64,
@@ -1530,6 +1544,18 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdRolesId(guild_id),
                 Cow::from(Route::guild_roles(guild_id)),
             ),
+            RouteInfo::EditVoiceState {
+                guild_id,
+                user_id,
+            } => {
+                let route = if let Some(user_id) = user_id {
+                    Cow::from(Route::guild_voice_states(guild_id, user_id))
+                } else {
+                    Cow::from(Route::guild_voice_states(guild_id, "@me"))
+                };
+
+                (LightMethod::Patch, Route::GuildsIdVoiceStates(guild_id), route)
+            },
             RouteInfo::EditWebhook {
                 webhook_id,
             } => (
